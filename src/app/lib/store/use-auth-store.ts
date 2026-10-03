@@ -3,31 +3,39 @@ import { persist } from 'zustand/middleware';
 
 export interface User {
     id: string;
-    name: string;
+    firstName: string;
+    lastName: string;
     email: string;
-    role: 'customer' | 'admin';
+    mobile: string;
+    role: 'customer' | 'admin' | string;
 }
 
 interface AuthState {
     user: User | null;
     token: string | null;
+    refreshToken: string | null;
     isAuthenticated: boolean;
-    login: (email: String, token: string, user: User) => void;
-    logout: () => void;
+    setAuth: (token: string, refreshToken: string, user: User) => void;
+    clearAuth: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
     persist((set) => ({
         user: null,
         token: null,
+        refreshToken: null,
         isAuthenticated: false,
-        login: (email, token, user) => {
-            set({ user, token, isAuthenticated: true });
-            document.cookie = `auth_token=${token}; path=/; max-age=86400; SameSite=Lax`;
+        setAuth: (token, refreshToken, user) => {
+            set({ user, token, refreshToken, isAuthenticated: true });
+            if (typeof document !== 'undefined') {
+                document.cookie = `auth_token=${token}; path=/; max-age=86400; SameSite=Lax`;
+            }
         },
-        logout: () => {
-            set({ user: null, token: null, isAuthenticated: false });
-            document.cookie = 'auth_token=; path=/; max-age=0;';
+        clearAuth: () => {
+            set({ user: null, token: null, refreshToken: null, isAuthenticated: false });
+            if (typeof document !== 'undefined') {
+                document.cookie = 'auth_token=; path=/; max-age=0;';
+            }
         },
     }),
         {
