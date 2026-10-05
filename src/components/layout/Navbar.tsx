@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { ShoppingCart, Store, UserIcon, LogOut, Menu } from 'lucide-react';
 import { logoutUser } from '@/app/lib/api/auth';
 import { useAuthStore } from '@/app/lib/store/use-auth-store';
@@ -11,6 +11,7 @@ import { useUIStore } from '@/app/lib/store/use-ui-store';
 
 export default function Navbar() {
   const router = useRouter();
+  const pathName = usePathname();
   const [mounted, setMounted] = useState(false);
   // const totalItems = useCartStore((state) => state.getTotalItems());
   const { user, refreshToken, isAuthenticated, clearAuth } = useAuthStore();
@@ -19,6 +20,11 @@ export default function Navbar() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const isAuthPage = pathName === '/login' || pathName === '/register';
+  if(!mounted || isAuthPage || !isAuthenticated){
+    return null;
+  }
 
   const handleLogout = async () => {
     try {

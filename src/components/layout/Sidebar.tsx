@@ -23,6 +23,10 @@ export default function Sidebar() {
   const { isSidebarOpen, closeSidebar } = useUIStore();
   const { user, refreshToken, isAuthenticated, clearAuth } = useAuthStore();
 
+  const isAuthPage = pathname === '/login' ||
+  pathname === '/register';
+  if(!isSidebarOpen || isAuthPage || !isAuthenticated) return null;
+
   if (!isSidebarOpen) return null;
 
   const handleLogout = async () => {
